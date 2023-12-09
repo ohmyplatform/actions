@@ -49,6 +49,6 @@ jobs:
             --git-commit-email="" \
             --git-dir="configuration/" \
             --git-file="deployment.yaml" \
-            --helm-key-values=".spec.template.spec.containers[].image=ghcr.io/plazalimon/${{ env.APP_NAME }}:${{ github.sha }}" \
+            --helm-key-values=".spec.template.spec.containers[].image=ghcr.io/plazalimon/${{ env.APP_NAME }}:sha-${{ github.sha }}" \
             --git-repo-url="git@github.com:plazalimon/argocd-apps.git" \
             --ssh-private-key="/tmp/id_rsa"
