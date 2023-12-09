@@ -1,0 +1,52 @@
+name: Update major and minor tags
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  update_tags:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+      - name: Create or update tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const version = "${{ github.event.release.tag_name }}";
+            const major = version.split(".")[0];
+            const minor = version.split(".").slice(0, 2).join(".");
+            try {
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'tags/' + major,
+                sha: context.sha,
+              })
+            } catch {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/' + major,
+                sha: context.sha,
+              })
+            }
+
+            try {
+              await github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'tags/' + minor,
+                sha: context.sha,
+              })
+            } catch {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/' + minor,
+                sha: context.sha,
+              })
+            }
