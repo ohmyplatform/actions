@@ -1,0 +1,54 @@
+name: Update ArgoCD Apps
+
+on:
+  workflow_call:
+
+env:
+  HELM_REPO_UPDATER_VERSION: "0.3.0"
+
+jobs:
+  updateArgoCDApp:
+
+    permissions:
+      contents: read
+      id-token: write
+      checks: write
+      statuses: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set app name based in repo name
+        run: |
+            echo "APP_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+
+      - name: Configure ~/.ssh/known_hosts
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.ARGOCD_APPS_DEPLOY_KEY }}
+
+      - name: Install SSH deploy-key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.ARGOCD_APPS_DEPLOY_KEY }}
+          name: id_rsa # optional
+          known_hosts: ~/.ssh/known_hosts
+          if_key_exists: fail
+
+      - name: Pull helm-repo-updater docker image
+        run: |
+          docker pull ghcr.io/docplanner/helm-repo-updater:${{ env.HELM_REPO_UPDATER_VERSION }}
+
+      - name: Set backend image tag
+        run: |
+          docker run -v ~/.ssh/id_rsa:/tmp/id_rsa -e SSH_KNOWN_HOSTS="/root/.ssh/known_hosts" ghcr.io/docplanner/helm-repo-updater:${{ env.HELM_REPO_UPDATER_VERSION }} run --app-name=${{ env.APP_NAME }} \
+            --git-branch="main" \
+            --git-commit-user="" \
+            --git-commit-email="" \
+            --git-dir="configuration/" \
+            --git-file="deployment.yaml" \
+            --helm-key-values=".spec.template.spec.containers[].image=ghcr.io/plazalimon/${{ env.APP_NAME }}:${{ github.sha }}" \
+            --git-repo-url="git@github.com:plazalimon/argocd-apps.git" \
+            --ssh-private-key="/tmp/id_rsa"
