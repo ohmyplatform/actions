@@ -39,6 +39,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
+
       - name: download, validate, install plantuml and its dependencies
         run: |
           curl -o plantuml.jar -L http://sourceforge.net/projects/plantuml/files/plantuml.1.2021.4.jar/download
@@ -60,4 +61,4 @@ jobs:
         run: techdocs-cli generate --no-docker --verbose
 
       - name: Publish docs site
-        run: techdocs-cli publish --publisher-type googleGcs --storage-name "${{ secrets.TECHDOCS_BUCKET_NAME }}" --entity "$ENTITY_NAMESPACE/$ENTITY_KIND/$ENTITY_NAME"
+        run: techdocs-cli publish --publisher-type googleGcs --storage-name "pidev-backstage-techdocs" --entity "$ENTITY_NAMESPACE/$ENTITY_KIND/$ENTITY_NAME"
