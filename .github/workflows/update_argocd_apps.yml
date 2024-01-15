@@ -2,6 +2,14 @@ name: Update ArgoCD Apps
 
 on:
   workflow_call:
+    inputs:
+      yaml_key:
+        type: string
+        default: '.spec.template.spec.containers[].image'
+      yaml_file:
+        type: string
+        default: 'deployment.yaml'
+      
 
 env:
   HELM_REPO_UPDATER_VERSION: "0.3.0"
@@ -48,7 +56,7 @@ jobs:
             --git-commit-user="" \
             --git-commit-email="" \
             --git-dir="configuration/" \
-            --git-file="deployment.yaml" \
-            --helm-key-values=".spec.template.spec.containers[].image=ghcr.io/${{ github.repository_owner }}/${{ env.APP_NAME }}:${{ github.sha }}" \
+            --git-file="${{ inputs.yaml_file }}" \
+            --helm-key-values="${{ inputs.yaml_key }}=ghcr.io/${{ github.repository_owner }}/${{ env.APP_NAME }}:${{ github.sha }}" \
             --git-repo-url="git@github.com:${{ github.repository_owner }}/argocd-apps.git" \
             --ssh-private-key="/tmp/id_rsa"
