@@ -4,9 +4,19 @@ on:
   workflow_call:
     inputs:
       techdocs_bucket_name:
-        description: 'Name of the GCS bucket to publish the site to'
+        description: 'Name of the GCS bucket to publish the site to.'
         type: string
         default: 'ohmyplatform-backstage-techdocs'
+    secrets:
+      GCP_PROJECT_ID:
+        description: 'Google Cloud Project ID where the bucket is.'
+        required: true
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        description: 'Google Workload Identity Provider'
+        required: true
+      GCP_SERVICE_ACCOUNT:
+        description: 'Google Service Account'
+        required: true
 
 jobs:
   publish-techdocs-site:
