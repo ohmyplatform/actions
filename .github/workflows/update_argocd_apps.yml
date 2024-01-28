@@ -9,6 +9,9 @@ on:
       yaml_file:
         type: string
         default: 'deployment.yaml'
+      value:
+        type: string
+        required: true
     secrets:
       ARGOCD_APPS_DEPLOY_KEY:
         required: true
@@ -59,6 +62,6 @@ jobs:
             --git-commit-email="" \
             --git-dir="configuration/" \
             --git-file="${{ inputs.yaml_file }}" \
-            --helm-key-values="${{ inputs.yaml_key }}=ghcr.io/${{ github.repository_owner }}/${{ env.APP_NAME }}:${{ github.sha }}" \
+            --helm-key-values="${{ inputs.yaml_key }}=${{ inputs.value }}" \
             --git-repo-url="git@github.com:${{ github.repository_owner }}/argocd-apps.git" \
             --ssh-private-key="/tmp/id_rsa"
