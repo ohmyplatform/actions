@@ -9,7 +9,9 @@ on:
       yaml_file:
         type: string
         default: 'deployment.yaml'
-      
+    secrets:
+      ARGOCD_APPS_DEPLOY_KEY:
+        required: true
 
 env:
   HELM_REPO_UPDATER_VERSION: "0.3.0"
