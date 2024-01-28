@@ -59,6 +59,6 @@ jobs:
             --git-commit-email="" \
             --git-dir="configuration/" \
             --git-file="${{ inputs.yaml_file }}" \
-            --helm-key-values="${{ inputs.yaml_key }}=ghcr.io/${{ github.repository_owner }}/${{ env.APP_NAME }}:${{ github.sha }}" \
+            --helm-key-values="${{ inputs.yaml_key }}=${{ github.sha }}" \
             --git-repo-url="git@github.com:${{ github.repository_owner }}/argocd-apps.git" \
             --ssh-private-key="/tmp/id_rsa"
