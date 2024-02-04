@@ -7,6 +7,10 @@ on:
         description: 'Name of the GCS bucket to publish the site to.'
         type: string
         default: 'ohmyplatform-backstage-techdocs'
+      publish_gh_pages:
+        description: 'Wether to publish docs to GitHub Pages.'
+        type: boolean
+        default: false
     secrets:
       GCP_PROJECT_ID:
         description: 'Google Cloud Project ID where the bucket is.'
@@ -25,6 +29,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pages: write
 
     env:
       ENTITY_NAMESPACE: 'default'
@@ -78,3 +83,16 @@ jobs:
 
       - name: Publish docs site
         run: techdocs-cli publish --publisher-type googleGcs --storage-name ${{ inputs.techdocs_bucket_name }} --entity "$ENTITY_NAMESPACE/$ENTITY_KIND/$ENTITY_NAME"
+
+      - name: Setup Pages
+        if: ${{ inputs.publish_gh_pages }}
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        if: ${{ inputs.publish_gh_pages }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './site'
+      - name: Deploy to GitHub Pages
+        if: ${{ inputs.publish_gh_pages }}
+        id: deployment
+        uses: actions/deploy-pages@v4
