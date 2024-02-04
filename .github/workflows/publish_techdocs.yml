@@ -28,7 +28,7 @@ jobs:
 
     permissions:
       id-token: write
-      contents: read
+      contents: write
 
     env:
       ENTITY_NAMESPACE: 'default'
@@ -83,9 +83,15 @@ jobs:
       - name: Publish docs site
         run: techdocs-cli publish --publisher-type googleGcs --storage-name ${{ inputs.techdocs_bucket_name }} --entity "$ENTITY_NAMESPACE/$ENTITY_KIND/$ENTITY_NAME"
 
-      - name: Publish GitHub pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
         if: ${{ inputs.publish_gh_pages }}
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        if: ${{ inputs.publish_gh_pages }}
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          path: './site'
+      - name: Deploy to GitHub Pages
+        if: ${{ inputs.publish_gh_pages }}
+        id: deployment
+        uses: actions/deploy-pages@v4
